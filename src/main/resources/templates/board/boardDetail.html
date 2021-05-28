@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>BoardDetail</title>
+</head>
+<body>
+<h2>글 세부 페이지</h2>
+<h3>읽기 전용 페이지</h3>
+
+<table border="1">
+    <div>
+        <label for="id">글번호</label>
+        <input type="text" name="id" id="id" th:value="${dto.id}" readonly/>
+    </div>
+    <div>
+        <label for="title">글제목</label>
+        <input type="text" name="title" id="title" th:value="${dto.title}" readonly/>
+    </div>
+    <div>
+        <label for="content">글내용</label>
+        <textarea rows="5" name="content" id="content" th:text="${dto.content}" readonly></textarea>
+    </div>
+    <div>
+        <label for="writer">작성자</label>
+        <input type="text" name="writer" id="writer" th:value="${dto.content}" readonly/>
+    </div>
+    <div>
+        <label for="regDate">작성일</label>
+        <input type="text" name="regDate" id="regDate" th:value="${#temporals.format(dto.regDate,'yyyy/MM/dd HH:mm:ss')}" readonly/>
+    </div>
+    <div>
+        <label for="modDate">수정일</label>
+        <input type="text" name="modDate" id="modDate" th:value="${#temporals.format(dto.modDate,'yyyy/MM/dd HH:mm:ss')}" readonly/>
+    </div>
+    <a th:href="@{/board}">목록보기</a>
+    <a th:href="@{/board/modify/{id}(id=${dto.id})}">글수정</a>
+</table>
+
+
+</body>
+</html>

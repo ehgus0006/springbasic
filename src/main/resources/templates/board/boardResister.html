@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>boardResister</title>
+
+</head>
+<body>
+
+<table border="1">
+    <form action="/board/resister" method="post">
+        <div>
+            <label for="title">제목</label>
+            <input type="text" name="title" id="title"/><br>
+        </div>
+        <div>
+            <label for="content">내용</label>
+            <textarea rows="5" name="content" id="content"></textarea><br>
+        </div>
+        <div>
+            <label for="writer">작성자</label>
+            <input type="text" name="writer" id="writer"/><br>
+        </div>
+        <div>
+            <button type="submit">저장</button>
+        </div>
+    </form>
+</table>
+
+</body>
+</html>
