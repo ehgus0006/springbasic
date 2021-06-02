@@ -1,6 +1,7 @@
 package com.test.springtest.controller;
 
 import com.test.springtest.dto.BoardSaveDTO;
+import com.test.springtest.dto.PageRequestDTO;
 import com.test.springtest.entity.Board;
 import com.test.springtest.repository.BoardRepository;
 import com.test.springtest.service.BoardService;
@@ -26,10 +27,11 @@ public class BoardController {
     private final BoardService boardService;
     private final BoardRepository boardRepository;
 
-    @GetMapping("")
-    public String main(Model model) {
-        model.addAttribute("dto", boardService.findAll());
-        return "main";
+    @GetMapping("/select")
+    public String main(PageRequestDTO pageRequestDTO, Model model) {
+        model.addAttribute("result", boardService.getList(pageRequestDTO));
+//        model.addAttribute("dto", boardService.findAll());
+        return "board/boardSelect";
     }
 
     @GetMapping("/resister")
@@ -42,22 +44,27 @@ public class BoardController {
         log.info(boardSaveDTO + "BoardController POST");
         boardService.save(boardSaveDTO);
         redirectAttributes.addFlashAttribute("dto", boardSaveDTO);
-        return "redirect:/board";
+        return "redirect:/board/select";
     }
 
+    //
+    //
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Model model,PageRequestDTO pageRequestDTO) {
         log.info("id =" + id);
         Board data = boardRepository.findById(id).get();
+        model.addAttribute("requestDTO", pageRequestDTO);
         model.addAttribute("dto", data);
         return "board/boardDetail";
     }
 
     @GetMapping("/modify/{id}")
-    public String modify(@PathVariable Long id, Model model) {
+    public String modify(PageRequestDTO requestDTO,@PathVariable Long id, Model model) {
         log.info("id =" + id);
+        log.info("page번호" + requestDTO.getPage());
         Board data = boardRepository.findById(id).get();
         model.addAttribute("dto", data);
+        model.addAttribute("requestDTO", requestDTO);
         return "board/boardModify";
     }
 

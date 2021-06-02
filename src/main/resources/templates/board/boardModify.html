@@ -1,87 +1,103 @@
 <!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      data-layout-decorate="~{layout/default}"
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+>
 <head>
-    <meta charset="UTF-8">
     <title>Modify</title>
-    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <link th:href="@{~/css/styles.css}" rel="stylesheet"/>
+<!--    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>-->
 </head>
 <body>
-<h2>글 수정 페이지</h2>
-<h3>글 번호, 작성자 빼고 수정이 가능합니다</h3>
-<table border="1">
-    <div>
-        <label for="id">글번호</label>
-        <input type="text" name="id" id="id" th:value="${dto.id}" readonly/>
+<div layout:fragment="box" class="box"></div>
+<div layout:fragment="content" class="content">
+    <div class="container-fluid align-content-center p-2">
+        <h2 class="mt-4">글 수정 페이지</h2>
+        <table class="table table-striped table-bordered table-hover">
+            <input type="hidden" name="page" id="page" th:value="${requestDTO.page}">
+            <div class="form-group">
+                <label for="id">글번호</label>
+                <input class="form-control" type="text" name="id" id="id" th:value="${dto.id}" readonly/>
+            </div>
+            <div class="form-group">
+                <label for="title">글제목</label>
+                <input class="form-control" type="text" name="title" id="title" th:value="${dto.title}"/>
+            </div>
+            <div class="form-group">
+                <label for="content">글내용</label>
+                <textarea class="form-control" rows="5" name="content" id="content" th:text="${dto.content}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="writer">작성자</label>
+                <input class="form-control" type="text" name="writer" id="writer" th:value="${dto.writer}" readonly/>
+            </div>
+            <a class="btn btn-black" th:href="@{/board/detail/{id}(id=${dto.id})}">이전</a>
+            <button type="button" class="btn btn-secondary" id="updateBtn">수정하기</button>
+            <button type="button" class="btn btn-primary" id="deleteBtn">삭제하기</button>
+        </table>
     </div>
-    <div>
-        <label for="title">글제목</label>
-        <input type="text" name="title" id="title" th:value="${dto.title}"/>
-    </div>
-    <div>
-        <label for="content">글내용</label>
-        <textarea rows="5" name="content" id="content" th:text="${dto.content}"></textarea>
-    </div>
-    <div>
-        <label for="writer">작성자</label>
-        <input type="text" name="writer" id="writer" th:value="${dto.writer}" readonly/>
-    </div>
-    <a th:href="@{/board/detail/{id}(id=${dto.id})}">이전</a>
-    <button id="updateBtn">수정하기</button>
-    <button id="deleteBtn">삭제하기</button>
-</table>
+    <script th:inline="javascript">
+        $(document).ready(function () {
 
-<script th:inline="javascript">
-    $(document).ready(function () {
+            var form = $("form");
 
-        //  수정하기
-        $('#updateBtn').click(function () {
-            var id = $('#id').val();
-            var data = {
-                title: $('#title').val(),
-                content: $('#content').val()
-            };
-            console.log(data);
-            console.log(id);
+            //  수정하기
+            $('#updateBtn').click(function () {
+                console.log("업데이트 클릭")
+                var id = $('#id').val();
+                var data = {
+                    title: $('#title').val(),
+                    content: $('#content').val()
+                };
+                console.log(data);
+                console.log(id);
 
-            $.ajax({
-                url: '/board/modify/' + id,
-                method: 'post',
-                data: JSON.stringify(data),
-                contentType: 'application/json; charset=utf-8',
-                success: function () {
-                    alert("글 수정에 성공하였습니다");
-                    location.href = "/board/detail/" + id;
-                },
-                error: function (error) {
-                    console.log(error)
-                    alert("글 수정에 실패하였습니다");
-                }
+                var page = $('#page').val();
+                console.log(page + "page번호는");
+
+                $.ajax({
+                    url: '/board/modify/' + id+'?page='+page,
+                    method: 'post',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        console.log(data);
+                        alert("글 수정에 성공하였습니다");
+                        location.href = "/board/detail/" + id+'?page='+data;
+                    },
+                    error: function (error) {
+                        console.log(error)
+                        alert("글 수정에 실패하였습니다");
+                    }
+                });
+            });
+
+            //  수정하기
+            $('#deleteBtn').click(function () {
+                var id = $("input[name='id']").val();
+                console.log(id);
+
+                $.ajax({
+                    url: '/board/delete/' + id,
+                    method: 'delete',
+                })
+                    .done(function (data) {
+                        console.log(data);
+                        alert("게시글을 삭제 하였습니다")
+                        location.href = "/board/select";
+                    })
+                    .fail(function (xhr, stats, error) {
+                        alert("게시글 삭제에 실패하였습니다");
+                    });
             });
         });
 
-        //  수정하기
-        $('#deleteBtn').click(function () {
-            var id = $("input[name='id']").val();
-            console.log(id);
 
-            $.ajax({
-                url: '/board/delete/' + id,
-                method: 'delete',
-            })
-                .done(function (data) {
-                    console.log(data);
-                    alert("게시글을 삭제 하였습니다")
-                    location.href = "/board";
-                })
-                .fail(function (xhr, stats, error) {
-                    alert("게시글 삭제에 실패하였습니다");
-                });
-        });
-    });
+    </script>
 
-
-</script>
+</div>
 
 
 </body>

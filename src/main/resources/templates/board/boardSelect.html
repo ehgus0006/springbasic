@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      data-layout-decorate="~{layout/default}"
+>
+<head>
+    <title>Main</title>
+    <link th:href="@{~/css/styles.css}" rel="stylesheet"/>
+
+</head>
+<body>
+<!--<div layout:fragment="imageSet" class="imageSet">-->
+<!--    <img class="img-fluid" th:src="@{~/assets/img/bg-masthead.jpg}" alt="Responsive image"/>-->
+<!--</div>-->
+<div layout:fragment="box" class="box"></div>
+
+<div layout:fragment="content" class="content" th:src="@{~/assets/img/bg-signup.jpg}">
+    <div class="container-fluid text-center p-2">
+        <h2 class="mt-4">게시판</h2>
+        <div class="row">
+            <div class="col-12 col-xl-12">
+                <table class="table table-striped">
+                    <tr>
+                        <th>글번호</th>
+                        <th>글제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                    </tr>
+                    <tr th:each="board : ${result.dtoList}">
+                        <td th:text="${board.id}"></td>
+                        <td><a th:text="${board.title}"
+                               th:href="@{/board/detail/{id}(id=${board.id}, page=${result.page})}"></a></td>
+                        <td th:text="${board.writer}"></td>
+                        <td th:text="${#temporals.format(board.regDate,'yyyy/MM/dd HH:mm:ss')}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" style="float: right; margin-right: 50px;" th:href="@{~/board/resister}">글등록</a>
+
+    <ul class="pagination h-100 justify-content-center align-items-center">
+        <li class="page-item" th:if="${result.prev}">
+            <a class="page-link" th:href="@{/board/select(page=${result.start -1})}" tabindex="-1">이전</a>
+        </li>
+        <li th:class=" 'page-item' + ${result.page == page? ' active':''}" th:each="page: ${result.pageList}">
+            <a class="page-link" th:href="@{/board/select(page=${page})}">
+                [[${page}]]
+            </a>
+        </li>
+        <li class="page-item" th:if="${result.next}">
+            <a class="page-link" th:href="@{/board/select(page=${result.end +1})}">다음</a>
+        </li>
+    </ul>
+
+</div>
+</body>
+</html>

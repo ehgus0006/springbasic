@@ -1,10 +1,7 @@
 package com.test.springtest.dto;
 
 import com.test.springtest.entity.Board;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Builder
 public class BoardListDTO {
 
     private Long id;
@@ -28,4 +26,6 @@ public class BoardListDTO {
         this.writer = board.getWriter();
         this.regDate = board.getRegDate();
     }
+
+
 }

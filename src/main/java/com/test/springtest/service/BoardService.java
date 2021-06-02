@@ -1,17 +1,19 @@
 package com.test.springtest.service;
 
-import com.test.springtest.dto.BoardListDTO;
-import com.test.springtest.dto.BoardModifyDTO;
-import com.test.springtest.dto.BoardSaveDTO;
+import com.test.springtest.dto.*;
 import com.test.springtest.entity.Board;
 import com.test.springtest.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,9 +65,37 @@ public class BoardService {
         /* repository는 deleteById delete 두가지 방법으로 삭제 할 수 있는데
         *  deleteById 를 사용하면 서비스 로직에서 메소드를 하나만 사용해도 조회와 삭제가 다된다
         *  delete 를 사용하면 조회 후 삭제 해야한다.
-        *  단점은 deleteById를 사용하면 조회 시 값이 없을 경우 mptyResultDataAccessException 이 발생하고
+        *  단점은 deleteById를 사용하면 조회 시 값이 없을 경우 ResultDataAccessException 이 발생하고
         *  더 다양한 퍼포먼스를 사용하려면 delete 를 사용해서 처리하는게 안정성과 유지보수에 용이 하다.
         */
-        boardRepository.deleteById(id);
+        Board board = boardRepository.findById(id).get(); //  조회
+        boardRepository.delete(board);
+
+//        boardRepository.deleteById(id);
+    }
+
+    private BoardListDTO dtoList(Board entity) {
+        BoardListDTO dto = BoardListDTO.builder()
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .content(entity.getContent())
+                .writer(entity.getWriter())
+                .regDate(entity.getRegDate())
+                .modDate(entity.getModDate())
+                .build();
+        return dto;
+    }
+
+    public PageResultDTO<BoardListDTO, Board> getList(PageRequestDTO pageRequestDTO) {
+
+        Pageable pageable = pageRequestDTO.getPageable(Sort.by("id").descending());
+
+
+        Page<Board> result = boardRepository.findAll(pageable);
+
+
+        Function<Board,BoardListDTO> fn = (entity -> dtoList(entity));
+
+        return new PageResultDTO<>(result, fn);
     }
 }
