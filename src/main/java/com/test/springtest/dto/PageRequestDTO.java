@@ -14,6 +14,8 @@ public class PageRequestDTO {
 
     private int page; // 페이지 번호
     private int size; // 페이지 수 10개
+    private String type; // 제목, 내용, 작성자
+    private String keyword; // 검색
 
     public PageRequestDTO() {
         this.page=1;

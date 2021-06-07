@@ -16,6 +16,27 @@
 <div layout:fragment="box" class="box"></div>
 
 <div layout:fragment="content" class="content" th:src="@{~/assets/img/bg-signup.jpg}">
+    <form th:action="@{/board/select}" method="get" id="searchForm">
+        <div class="input-group mt-1" style="width: 60%; margin-left: 35%">
+            <input type="hidden" name="page" value="1">
+            <div class="input-group-prepend">
+                <select name="type" style="height: 58px;">
+                    <option th:selected="${pageRequestDTO.type == null}"></option>
+                    <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
+                    <option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
+                    <option value="w" th:selected="${pageRequestDTO.type == 'w'}">작성자</option>
+                    <option value="tc" th:selected="${pageRequestDTO.type == 'tc'}">제목+내용</option>
+                    <option value="tcw" th:selected="${pageRequestDTO.type == 'tcw'}">제목+내용+작성자</option>
+                </select>
+            </div>
+            <input class="form-control" name="keyword" th:value="${pageRequestDTO.keyword}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary btn-search" type="button">Search</button>
+                <button class="btn btn-outline-secondary btn-clear" type="button">Clear</button>
+            </div>
+        </div>
+    </form>
+
     <div class="container-fluid text-center p-2">
         <h2 class="mt-4">게시판</h2>
         <div class="row">
@@ -30,7 +51,9 @@
                     <tr th:each="board : ${result.dtoList}">
                         <td th:text="${board.id}"></td>
                         <td><a th:text="${board.title}"
-                               th:href="@{/board/detail/{id}(id=${board.id}, page=${result.page})}"></a></td>
+                               th:href="@{/board/detail/{id}(id=${board.id}, page=${result.page},
+                                                                    type=${pageRequestDTO.type},
+                                                                    keyword=${pageRequestDTO.keyword})}"></a></td>
                         <td th:text="${board.writer}"></td>
                         <td th:text="${#temporals.format(board.regDate,'yyyy/MM/dd HH:mm:ss')}"></td>
                     </tr>
@@ -43,17 +66,36 @@
 
     <ul class="pagination h-100 justify-content-center align-items-center">
         <li class="page-item" th:if="${result.prev}">
-            <a class="page-link" th:href="@{/board/select(page=${result.start -1})}" tabindex="-1">이전</a>
+            <a class="page-link" th:href="@{/board/select(page=${result.start -1},
+                                                                    type=${pageRequestDTO.type},
+                                                                    keyword=${pageRequestDTO.keyword})}" tabindex="-1">이전</a>
         </li>
         <li th:class=" 'page-item' + ${result.page == page? ' active':''}" th:each="page: ${result.pageList}">
-            <a class="page-link" th:href="@{/board/select(page=${page})}">
+            <a class="page-link" th:href="@{/board/select(page=${page},
+                                                                    type=${pageRequestDTO.type},
+                                                                    keyword=${pageRequestDTO.keyword})}">
                 [[${page}]]
             </a>
         </li>
         <li class="page-item" th:if="${result.next}">
-            <a class="page-link" th:href="@{/board/select(page=${result.end +1})}">다음</a>
+            <a class="page-link" th:href="@{/board/select(page=${result.end +1},
+                                                                    type=${pageRequestDTO.type},
+                                                                    keyword=${pageRequestDTO.keyword})}">다음</a>
         </li>
     </ul>
+
+    <script th:inline="javascript">
+
+        var searchForm = $('#searchForm');
+
+        $('.btn-search').click(function () {
+            searchForm.submit();
+        });
+
+        $('.btn-clear').click(function () {
+            searchForm.empty().submit();
+        });
+    </script>
 
 </div>
 </body>

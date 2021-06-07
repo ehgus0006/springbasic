@@ -30,6 +30,7 @@ public class BoardController {
     @GetMapping("/select")
     public String main(PageRequestDTO pageRequestDTO, Model model) {
         model.addAttribute("result", boardService.getList(pageRequestDTO));
+        model.addAttribute("pageRequestDTO", pageRequestDTO);
 //        model.addAttribute("dto", boardService.findAll());
         return "board/boardSelect";
     }

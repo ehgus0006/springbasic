@@ -19,13 +19,16 @@ public class BoardApiController {
     private final BoardService boardService;
 
     @PostMapping("/modify/{id}")
-    public int modify(@PathVariable Long id, @RequestBody BoardModifyDTO modifyDTO, PageRequestDTO pageRequestDTO,
+    public PageRequestDTO modify(@PathVariable Long id, @RequestBody BoardModifyDTO modifyDTO, PageRequestDTO pageRequestDTO,
                       RedirectAttributes redirectAttributes) {
         log.info("id=" + id);
         log.info("데이터 값들" + modifyDTO.getTitle() + "/" + modifyDTO.getContent());
         redirectAttributes.addAttribute("page", pageRequestDTO.getPage());
+        redirectAttributes.addAttribute("type", pageRequestDTO.getType());
+        redirectAttributes.addAttribute("keyword", pageRequestDTO.getKeyword());
+
         boardService.modify(id, modifyDTO);
-        return pageRequestDTO.getPage();
+        return pageRequestDTO;
     }
 
 

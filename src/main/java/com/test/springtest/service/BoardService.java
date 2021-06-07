@@ -1,13 +1,17 @@
 package com.test.springtest.service;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.test.springtest.dto.*;
 import com.test.springtest.entity.Board;
+import com.test.springtest.entity.QBoard;
 import com.test.springtest.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +42,6 @@ public class BoardService {
     public List<BoardListDTO> findAll() {
         // 스트림은 자바8에 새롭게 추가된 기능으로, 선언형(sql같은 질의형)으로 데이터(컬렉션, 배열, 파일, iterate...)를 처리할 수 있다.
         // Collectors 란 Stream 을 일반적인 List, Set 등으로 변경시키는 Stream 메서드
-        // https://velog.io/@adam2/JAVA8%EC%9D%98-%EC%8A%A4%ED%8A%B8%EB%A6%BC-%EC%95%8C%EC%95%84%EB%B3%B4%EA%B8%B0 참고
-        // 이해 못할까봐 예시 너어줌
         // List<String> givenList = Arrays.asList("a", "bb", "cc", "bb");
         // List<String> result = givenList.stream().collect(Collectors.toList()); // a, bb, ccc, dd
 
@@ -89,13 +91,44 @@ public class BoardService {
     public PageResultDTO<BoardListDTO, Board> getList(PageRequestDTO pageRequestDTO) {
 
         Pageable pageable = pageRequestDTO.getPageable(Sort.by("id").descending());
-
-
-        Page<Board> result = boardRepository.findAll(pageable);
-
-
+        BooleanBuilder booleanBuilder = getSearch(pageRequestDTO);
+        Page<Board> result = boardRepository.findAll(booleanBuilder,pageable);
         Function<Board,BoardListDTO> fn = (entity -> dtoList(entity));
 
         return new PageResultDTO<>(result, fn);
     }
+
+    private BooleanBuilder getSearch(PageRequestDTO requestDto) {  // Querydsl처리
+        String type = requestDto.getType();
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QBoard qBoard = QBoard.board;
+        String keyword = requestDto.getKeyword();
+        BooleanExpression expression = qBoard.id.gt(0L);
+        booleanBuilder.and(expression);
+
+        //검색조건이 없는경우
+        if (type == null || type.trim().length() == 0) {
+            return booleanBuilder;
+        }
+
+        // 검색조건을 작성하기
+        BooleanBuilder conditionBuilder = new BooleanBuilder();
+
+        if (type.contains("t")) {
+            conditionBuilder.or(qBoard.title.contains(keyword));
+        }
+        if (type.contains("c")) {
+            conditionBuilder.or(qBoard.content.contains(keyword));
+        }
+        if (type.contains("w")) {
+            conditionBuilder.or(qBoard.writer.contains(keyword));
+        }
+
+        // 모든조건 통합
+        booleanBuilder.and(conditionBuilder);
+
+        return booleanBuilder;
+    }
+
+
 }

@@ -44,8 +44,12 @@
                 <input class="form-control" type="text" name="modDate" id="modDate"
                        th:value="${#temporals.format(dto.modDate,'yyyy/MM/dd HH:mm:ss')}" readonly/>
             </div>
-            <a class="btn btn-primary" th:href="@{/board/select(page=${requestDTO.page})}">목록보기</a>
-            <a class="btn btn-dark" th:href="@{/board/modify/{id}(id=${dto.id}, page=${requestDTO.page})}">글수정</a>
+            <a class="btn btn-primary" th:href="@{/board/select(page=${requestDTO.page},
+                                                                    type=${requestDTO.type},
+                                                                    keyword=${requestDTO.keyword})}">목록보기</a>
+            <a class="btn btn-dark" th:href="@{/board/modify/{id}(id=${dto.id}, page=${requestDTO.page},
+                                                                    type=${requestDTO.type},
+                                                                    keyword=${requestDTO.keyword})}">글수정</a>
         </table>
     </div>
 </div>
